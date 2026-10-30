@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coevaluación — Fuentes de energía</title>
+<style>
+/* ============================================================
+   CONFIGURACIÓN RÁPIDA  →  edita solo este bloque CSS de marca
+   La configuración funcional está en el <script> CONFIG, abajo.
+   ============================================================ */
+:root{
+  --bg:#f3f7f4; --card:#ffffff; --ink:#1b2a26; --muted:#5a6b64;
+  --line:#dde7e1; --brand:#1f9d6b; --brand-ink:#157a50;
+  --ok:#1f9d57; --warn:#c9820b; --bad:#d04646;
+  --accent:#e9f5ee; --shadow:0 1px 3px rgba(20,40,30,.08),0 8px 24px rgba(20,40,30,.06);
+  --radius:14px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1613; --card:#16201c; --ink:#e7efe9; --muted:#9bb0a6;
+    --line:#293630; --brand:#45c58c; --brand-ink:#86e0b4;
+    --ok:#4cc884; --warn:#e2a93f; --bad:#f06a6a;
+    --accent:#172821; --shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1613; --card:#16201c; --ink:#e7efe9; --muted:#9bb0a6;
+  --line:#293630; --brand:#45c58c; --brand-ink:#86e0b4;
+  --ok:#4cc884; --warn:#e2a93f; --bad:#f06a6a;
+  --accent:#172821; --shadow:0 1px 3px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.5;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:900px; margin:0 auto; padding:16px;}
+header.top{display:flex; align-items:center; gap:12px; padding:18px 16px 6px;}
+header.top .logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--brand),#7fd9a8);display:grid;place-items:center;color:#fff;font-weight:800;font-size:21px;flex:0 0 auto}
+header.top h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.2px}
+header.top .sub{font-size:12.5px;color:var(--muted);margin-top:1px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin:14px 0}
+h2{font-size:18px;margin:.1em 0 .5em;letter-spacing:-.2px}
+h3{font-size:15px;margin:1.1em 0 .4em}
+p{margin:.4em 0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--accent);color:var(--brand-ink);border:1px solid var(--line)}
+label{display:block;font-weight:600;font-size:13.5px;margin:.9em 0 .3em}
+input[type=text],input[type=password],select,textarea{
+  width:100%;font:inherit;color:inherit;background:var(--bg);
+  border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--brand)}
+textarea{resize:vertical;min-height:64px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;
+  font:inherit;font-weight:650;border:none;border-radius:11px;padding:12px 18px;
+  background:var(--brand);color:#fff;transition:filter .15s, transform .05s}
+.btn:hover{filter:brightness(1.07)} .btn:active{transform:translateY(1px)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--brand-ink);border:1.5px solid var(--line)}
+.btn.sec{background:var(--accent);color:var(--brand-ink)}
+.btn.danger{background:var(--bad)}
+.btn.wide{width:100%}
+.btn.small{padding:8px 12px;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.center{text-align:center}
+.hidden{display:none !important}
+.notice{padding:10px 13px;border-radius:10px;font-size:13.5px;border:1px solid;margin:10px 0}
+.notice.info{background:var(--accent);border-color:var(--line);color:var(--brand-ink)}
+.notice.ok{background:rgba(31,157,87,.12);border-color:rgba(31,157,87,.4);color:var(--ok)}
+.notice.err{background:rgba(208,70,70,.12);border-color:rgba(208,70,70,.4);color:var(--bad)}
+
+/* role picker */
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.roles{grid-template-columns:1fr}}
+.role{cursor:pointer;text-align:center;padding:26px 18px}
+.role .ic{font-size:34px;line-height:1}
+.role h2{margin:.4em 0 .2em}
+
+/* rubric criterion */
+.crit{border:1px solid var(--line);border-radius:12px;padding:16px;margin:14px 0;background:var(--card)}
+.crit .chead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.crit .cname{font-weight:700;font-size:15px}
+.crit .cmax{font-size:12px;color:var(--muted);white-space:nowrap}
+.bands{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:12px 0 4px}
+@media(max-width:620px){.bands{grid-template-columns:1fr}}
+.band{border:1.5px solid var(--line);border-radius:10px;padding:10px;cursor:pointer;font-size:12.5px;transition:border-color .12s,background .12s}
+.band:hover{border-color:var(--brand)}
+.band.sel{border-color:var(--brand);background:var(--accent)}
+.band .blabel{font-weight:700;display:flex;justify-content:space-between;margin-bottom:4px}
+.band .blabel .pts{color:var(--muted);font-weight:600}
+.band .bdesc{color:var(--muted);line-height:1.4}
+.scorebar{display:flex;align-items:center;gap:12px;margin-top:10px}
+.scorebar input[type=range]{flex:1;accent-color:var(--brand)}
+.scorebar .val{font-weight:800;font-size:16px;min-width:64px;text-align:right}
+.totalbox{display:flex;justify-content:space-between;align-items:center;
+  background:var(--accent);border:1px solid var(--line);border-radius:12px;padding:14px 18px;margin-top:6px}
+.totalbox .n{font-size:30px;font-weight:800;letter-spacing:-.5px}
+.totalbox .n small{font-size:15px;color:var(--muted);font-weight:600}
+
+/* teacher table */
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.grp{cursor:pointer}
+tr.grp:hover{background:var(--accent)}
+.grade{font-weight:800;font-size:15px}
+.detail td{background:var(--bg);font-size:12.5px;color:var(--muted)}
+.chip{display:inline-block;background:var(--accent);border:1px solid var(--line);border-radius:999px;padding:2px 8px;margin:2px;font-size:11.5px}
+
+/* reveal / mostrar a la clase */
+.reveal{position:fixed;inset:0;background:var(--bg);z-index:50;display:grid;place-items:center;padding:24px}
+.reveal .inner{text-align:center;max-width:620px}
+.reveal .rgrade{font-size:84px;font-weight:800;letter-spacing:-2px;margin:.1em 0;color:var(--brand-ink)}
+.reveal .rname{font-size:24px;font-weight:700}
+.reveal .rbreak{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:18px 0}
+.reveal .rbreak div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;box-shadow:var(--shadow);font-size:13px}
+.reveal .rbreak b{display:block;font-size:20px}
+.footer{color:var(--muted);font-size:12px;text-align:center;padding:18px 0 28px}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.linkbtn{background:none;border:none;color:var(--brand-ink);cursor:pointer;font:inherit;text-decoration:underline;padding:0}
+</style>
+</head>
+<body>
+<header class="top wrap">
+  <div class="logo">⚡</div>
+  <div>
+    <h1 id="h-title">Coevaluación de presentaciones</h1>
+    <div class="sub" id="h-sub">Tecnología · 4.º ESO</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- Banner modo demo -->
+  <div id="demoBanner" class="notice info hidden">
+    <b>Modo demostración.</b> Las evaluaciones se guardan solo en este navegador. Para uso real en clase, pega la URL de tu Web App de Apps Script en <code>CONFIG.backendUrl</code>.
+  </div>
+
+  <!-- ===================== VISTA: INICIO ===================== -->
+  <section id="view-home">
+    <div class="card center">
+      <span class="tag" id="critTag">Criterios 3.2 y 6.1</span>
+      <h2 style="margin-top:12px" id="homeTopic">Fuentes de energía</h2>
+      <p class="muted small" id="homeCritDesc"></p>
+    </div>
+    <div class="roles">
+      <div class="card role" onclick="go('student')">
+        <div class="ic">🧑‍🎓</div>
+        <h2>Soy alumno/a</h2>
+        <p class="muted small">Evaluar la presentación de un grupo o compañero/a</p>
+      </div>
+      <div class="card role" onclick="go('teacher-login')">
+        <div class="ic">🧑‍🏫</div>
+        <h2>Soy el profesor</h2>
+        <p class="muted small">Ver y mostrar las notas (requiere contraseña)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VISTA: ALUMNO ===================== -->
+  <section id="view-student" class="hidden">
+    <div class="card">
+      <button class="linkbtn" onclick="go('home')">← Volver</button>
+      <h2 style="margin-top:8px">Evaluar una presentación</h2>
+      <p class="muted small">Valora cada aspecto según la rúbrica. La nota se calcula sola sobre 10 (cada aspecto pesa lo que marca la rúbrica).</p>
+
+      <label for="evName">Tu nombre y apellidos (o tus iniciales)</label>
+      <input type="text" id="evName" placeholder="Ej.: M. L. G." autocomplete="off">
+
+      <label for="evGroup">Grupo o compañero/a que has evaluado</label>
+      <select id="evGroup"><option value="">— Selecciona —</option></select>
+
+      <div id="rubricArea"></div>
+
+      <label for="evComment">Comentario (opcional)</label>
+      <textarea id="evComment" placeholder="Qué ha estado bien, qué se puede mejorar…"></textarea>
+
+      <div class="totalbox">
+        <span>Nota de esta evaluación</span>
+        <span class="n"><span id="totalNum">0.0</span><small> / 10</small></span>
+      </div>
+
+      <div id="studentMsg"></div>
+      <button class="btn wide" id="submitBtn" style="margin-top:12px" onclick="submitEval()">Enviar evaluación</button>
+    </div>
+  </section>
+
+  <!-- ===================== VISTA: PROFESOR (login) ===================== -->
+  <section id="view-teacher-login" class="hidden">
+    <div class="card">
+      <button class="linkbtn" onclick="go('home')">← Volver</button>
+      <h2 style="margin-top:8px">Panel del profesor</h2>
+      <label for="pwd">Contraseña</label>
+      <input type="password" id="pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')teacherLogin()">
+      <div id="loginMsg"></div>
+      <button class="btn wide" style="margin-top:12px" onclick="teacherLogin()">Entrar</button>
+    </div>
+  </section>
+
+  <!-- ===================== VISTA: PROFESOR (panel) ===================== -->
+  <section id="view-teacher" class="hidden">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <button class="linkbtn" onclick="go('home')">← Inicio</button>
+        <div class="row">
+          <button class="btn sec small" onclick="loadData()">↻ Actualizar</button>
+        </div>
+      </div>
+      <h2 style="margin-top:8px">Resultados</h2>
+      <p class="muted small" id="teacherSummary"></p>
+      <div id="teacherMsg"></div>
+      <div class="tablewrap"><div id="resultsArea"></div></div>
+    </div>
+
+    <div class="card">
+      <h3>Grupos / compañeros a evaluar</h3>
+      <p class="muted small">Estos son los que aparecen en la lista desplegable del alumno. Pon aquí las iniciales de cada grupo.</p>
+      <div id="groupChips" style="margin:8px 0"></div>
+      <div class="row">
+        <input type="text" id="newGroup" placeholder="Iniciales del grupo o alumno/a" style="flex:1;min-width:180px">
+        <button class="btn sec" onclick="addGroup()">Añadir</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="footer">Criterios de evaluación <span id="footCrit"></span> · 4.º ESO Tecnología · IES Zaframagón</div>
+
+<!-- ===================== REVEAL (mostrar a la clase) ===================== -->
+<div id="reveal" class="reveal hidden">
+  <div class="inner">
+    <div class="rname" id="rvName"></div>
+    <div class="rgrade" id="rvGrade"></div>
+    <div class="muted" id="rvCount"></div>
+    <div class="rbreak" id="rvBreak"></div>
+    <button class="btn" onclick="closeReveal()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+/* =================================================================
+   CONFIG — edita aquí todo lo funcional
+   ================================================================= */
+const CONFIG = {
+  title: "Coevaluación de presentaciones",
+  subtitle: "Tecnología · 4.º ESO",
+  topic: "Fuentes de energía",
+  criterio: "3.2 y 6.1",
+  criterioDesc: "3.2 Presentar y difundir propuestas de manera efectiva (discurso, tiempo, lenguaje inclusivo). · 6.1 Uso responsable de la tecnología: sostenibilidad e impacto en la sociedad y el planeta.",
+
+  // Contraseña del panel del profesor (cámbiala)
+  teacherPassword: "zaframagon",
+
+  // URL del Web App de Apps Script. Vacío = modo demostración (localStorage).
+  backendUrl: "",
+
+  // Alumnos (iniciales). También se gestionan desde el panel del profesor / la hoja.
+  // Si presentan en grupo, sustituye por los grupos (p. ej. "G1 · A.A.Z., B.C.R.").
+  defaultGroups: ["A.A.Z.","B.C.R.","F.I.C.T.","R.C.C.","E.C.F.","J.G.C.","A.G.M.","H.M.R.","P.P.M.","D.P.R.","A.P.T.","J.R.G.","M.S.B.","J.T.P.","A.T.R."],
+
+  // Rúbrica PONDERADA: cada aspecto se puntúa de 0 a 10; la nota final = Σ (nota × peso).
+  // Los pesos suman 1 (100%). Bandas: Insuficiente 0–4 · Adecuado 5–7 · Excelente 8–10.
+  rubric: [
+    {
+      id:"c1", name:"Explicación del proceso", crit:"3.2", peso:0.30,
+      bands:[
+        {label:"Insuficiente", range:"0–4", def:3,
+         desc:"Confusa o con errores: no queda claro cómo se genera la electricidad a partir de la fuente."},
+        {label:"Adecuado", range:"5–7", def:6,
+         desc:"Correcta pero incompleta: se entiende el proceso, aunque faltan pasos o detalles."},
+        {label:"Excelente", range:"8–10", def:9,
+         desc:"Clara, rigurosa y completa: de la fuente a la electricidad que llega a casa."}
+      ]
+    },
+    {
+      id:"c2", name:"Esquema y apoyo visual", crit:"3.2", peso:0.15,
+      bands:[
+        {label:"Insuficiente", range:"0–4", def:3,
+         desc:"Sin esquema del proceso o diapositivas ilegibles."},
+        {label:"Adecuado", range:"5–7", def:6,
+         desc:"Esquema simple y legible; diapositivas correctas."},
+        {label:"Excelente", range:"8–10", def:9,
+         desc:"Esquema claro del proceso y diapositivas cuidadas, con imágenes que apoyan la explicación."}
+      ]
+    },
+    {
+      id:"c3", name:"Exposición en la pizarra", crit:"3.2", peso:0.25,
+      bands:[
+        {label:"Insuficiente", range:"0–4", def:3,
+         desc:"Lee las diapositivas y no se entiende la exposición."},
+        {label:"Adecuado", range:"5–7", def:6,
+         desc:"Expone con claridad, aunque con inseguridad o apoyándose mucho en las diapositivas."},
+        {label:"Excelente", range:"8–10", def:9,
+         desc:"Buena entonación, control del tiempo y dominio del tema."}
+      ]
+    },
+    {
+      id:"c4", name:"Sostenibilidad e impacto", crit:"6.1", peso:0.20,
+      bands:[
+        {label:"Insuficiente", range:"0–4", def:3,
+         desc:"No trata la sostenibilidad ni el impacto ambiental."},
+        {label:"Adecuado", range:"5–7", def:6,
+         desc:"Expone ventajas e inconvenientes de la fuente de energía."},
+        {label:"Excelente", range:"8–10", def:9,
+         desc:"Análisis crítico del impacto ambiental y social de la fuente."}
+      ]
+    },
+    {
+      id:"c5", name:"Autoría y uso de la IA", crit:"6.1", peso:0.10,
+      bands:[
+        {label:"Insuficiente", range:"0–4", def:3,
+         desc:"Trabajo copiado o no sabe defenderlo."},
+        {label:"Adecuado", range:"5–7", def:6,
+         desc:"Trabajo propio con una defensa básica."},
+        {label:"Excelente", range:"8–10", def:9,
+         desc:"Defensa sólida y con fuentes citadas; la IA solo como apoyo."}
+      ]
+    }
+  ]
+};
+
+/* =================================================================
+   Estado y utilidades
+   ================================================================= */
+const DEMO = !CONFIG.backendUrl;
+let GROUPS = [];
+const scores = {};       // id -> valor (0–10)
+const touched = {};      // id -> bool (si el alumno ya lo ha tocado)
+
+const $ = s => document.querySelector(s);
+const el = (t,c)=>{const e=document.createElement(t); if(c)e.className=c; return e;};
+function msg(where,text,type){const b=$(where); if(!text){b.innerHTML="";return;} b.innerHTML=`<div class="notice ${type||'info'}">${text}</div>`;}
+function round2(n){return Math.round(n*100)/100;}
+function fmt(n){return (Math.round(n*10)/10).toFixed(1);}
+function pct(p){return Math.round(p*100)+"%";}
+
+/* ---- Arranque ---- */
+function init(){
+  $("#h-title").textContent=CONFIG.title;
+  $("#h-sub").textContent=CONFIG.subtitle;
+  $("#homeTopic").textContent=CONFIG.topic;
+  $("#critTag").textContent="Criterios "+CONFIG.criterio;
+  $("#homeCritDesc").textContent=CONFIG.criterioDesc;
+  $("#footCrit").textContent=CONFIG.criterio;
+  if(DEMO) $("#demoBanner").classList.remove("hidden");
+  buildRubric();
+  GROUPS = loadGroupsLocal();
+  refreshGroupSelect();
+}
+
+/* ---- Rúbrica (vista alumno) ---- */
+function buildRubric(){
+  const area=$("#rubricArea"); area.innerHTML="";
+  CONFIG.rubric.forEach(c=>{
+    scores[c.id]=0; touched[c.id]=false;
+    const box=el("div","crit");
+    box.innerHTML=`<div class="chead"><span class="cname">${c.name}</span><span class="cmax">Crit. ${c.crit} · peso ${pct(c.peso)}</span></div>`;
+    const bands=el("div","bands");
+    c.bands.forEach((b,i)=>{
+      const bd=el("div","band"); bd.dataset.crit=c.id; bd.dataset.i=i;
+      bd.innerHTML=`<div class="blabel"><span>${b.label}</span><span class="pts">${b.range}</span></div><div class="bdesc">${b.desc}</div>`;
+      bd.onclick=()=>setScore(c.id,b.def);
+      bands.appendChild(bd);
+    });
+    box.appendChild(bands);
+    const bar=el("div","scorebar");
+    bar.innerHTML=`<input type="range" min="0" max="10" step="0.5" value="0" data-crit="${c.id}">
+      <span class="val"><span id="v-${c.id}">0.0</span> / 10</span>`;
+    bar.querySelector("input").addEventListener("input",e=>setScore(c.id,parseFloat(e.target.value)));
+    box.appendChild(bar);
+    area.appendChild(box);
+  });
+  recalcTotal();
+}
+function setScore(id,val){
+  val=Math.max(0,Math.min(10,val));
+  scores[id]=val; touched[id]=true;
+  $("#v-"+id).textContent=fmt(val);
+  const range=document.querySelector(`input[type=range][data-crit="${id}"]`); if(range)range.value=val;
+  // marcar banda activa según valor: 0–4 Insuf · 5–7 Adecuado · 8–10 Excelente
+  let bi = val<4.5?0 : (val<7.5?1:2);
+  document.querySelectorAll(`.band[data-crit="${id}"]`).forEach(b=>{
+    b.classList.toggle("sel", parseInt(b.dataset.i)===bi);
+  });
+  recalcTotal();
+}
+function recalcTotal(){
+  let t=0; CONFIG.rubric.forEach(c=>t+=(scores[c.id]||0)*c.peso);
+  $("#totalNum").textContent=fmt(t);
+  return round2(t);
+}
+
+/* ---- Navegación ---- */
+function go(view){
+  ["home","student","teacher-login","teacher"].forEach(v=>$("#view-"+v).classList.add("hidden"));
+  if(view==="teacher"){ $("#view-teacher").classList.remove("hidden"); loadData(); }
+  else if(view==="teacher-login"){ $("#view-teacher-login").classList.remove("hidden"); $("#pwd").value=""; msg("#loginMsg",""); }
+  else $("#view-"+view).classList.remove("hidden");
+  window.scrollTo(0,0);
+}
+
+/* ---- Grupos: lista desplegable ---- */
+function refreshGroupSelect(){
+  const sel=$("#evGroup"); const cur=sel.value;
+  sel.innerHTML='<option value="">— Selecciona —</option>';
+  GROUPS.forEach(g=>{const o=el("option");o.value=g;o.textContent=g;sel.appendChild(o);});
+  sel.value=cur;
+  renderGroupChips();
+}
+function renderGroupChips(){
+  const c=$("#groupChips"); if(!c)return; c.innerHTML="";
+  if(!GROUPS.length){c.innerHTML='<span class="muted small">Sin grupos todavía.</span>';return;}
+  GROUPS.forEach(g=>{
+    const chip=el("span","chip");
+    chip.innerHTML=`${esc(g)} <button class="linkbtn" title="Quitar" style="color:var(--bad)" onclick="removeGroup('${g.replace(/'/g,"\\'")}')">✕</button>`;
+    c.appendChild(chip);
+  });
+}
+async function addGroup(){
+  const v=$("#newGroup").value.trim(); if(!v)return;
+  if(GROUPS.includes(v)){ $("#newGroup").value=""; return; }
+  GROUPS.push(v); $("#newGroup").value="";
+  saveGroupsLocal(GROUPS); refreshGroupSelect();
+  if(!DEMO) await api({action:"setGroups",password:CONFIG.teacherPassword,groups:GROUPS});
+}
+async function removeGroup(g){
+  GROUPS=GROUPS.filter(x=>x!==g);
+  saveGroupsLocal(GROUPS); refreshGroupSelect();
+  if(!DEMO) await api({action:"setGroups",password:CONFIG.teacherPassword,groups:GROUPS});
+}
+
+/* ---- Enviar evaluación ---- */
+async function submitEval(){
+  const name=$("#evName").value.trim();
+  const group=$("#evGroup").value;
+  if(!name){ msg("#studentMsg","Escribe tu nombre o tus iniciales.","err"); return; }
+  if(!group){ msg("#studentMsg","Selecciona el grupo que has evaluado.","err"); return; }
+  const untouched=CONFIG.rubric.filter(c=>!touched[c.id]);
+  if(untouched.length){ msg("#studentMsg","Valora todos los aspectos de la rúbrica antes de enviar.","err"); return; }
+  const total=recalcTotal();
+  const payload={
+    action:"submit", evaluador:name, grupo:group,
+    c1:scores.c1, c2:scores.c2, c3:scores.c3, c4:scores.c4, c5:scores.c5,
+    total:total, comentario:$("#evComment").value.trim()
+  };
+  const btn=$("#submitBtn"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> Enviando…';
+  try{
+    if(DEMO){ demoSubmit(payload); }
+    else{ const r=await api(payload); if(!r||!r.ok) throw new Error(r&&r.error||"Error del servidor"); }
+    msg("#studentMsg",`¡Evaluación enviada! Has puesto <b>${fmt(total)}/10</b> a <b>${esc(group)}</b>. Gracias.`,"ok");
+    // reset parcial: deja el nombre, limpia selección y notas
+    $("#evGroup").value=""; $("#evComment").value="";
+    CONFIG.rubric.forEach(c=>{setScore(c.id,0); touched[c.id]=false; document.querySelectorAll(`.band[data-crit="${c.id}"]`).forEach(b=>b.classList.remove("sel"));});
+  }catch(e){
+    msg("#studentMsg","No se pudo enviar: "+e.message+". Inténtalo de nuevo.","err");
+  }finally{
+    btn.disabled=false; btn.textContent="Enviar evaluación";
+  }
+}
+
+/* ---- Profesor ---- */
+function teacherLogin(){
+  if($("#pwd").value===CONFIG.teacherPassword){ msg("#loginMsg",""); go("teacher"); }
+  else msg("#loginMsg","Contraseña incorrecta.","err");
+}
+
+async function loadData(){
+  msg("#teacherMsg","");
+  $("#resultsArea").innerHTML='<p class="muted small">Cargando…</p>';
+  let evals=[], groups=GROUPS;
+  try{
+    if(DEMO){ evals=demoAll(); groups=loadGroupsLocal(); }
+    else{
+      const r=await api({action:"data",password:CONFIG.teacherPassword});
+      if(!r||!r.ok) throw new Error(r&&r.error||"Error");
+      evals=r.evaluaciones||[]; groups=r.grupos||[];
+    }
+  }catch(e){ msg("#teacherMsg","No se pudieron cargar los datos: "+e.message,"err"); $("#resultsArea").innerHTML=""; return; }
+  GROUPS=groups.length?groups:GROUPS; saveGroupsLocal(GROUPS); refreshGroupSelect();
+  renderResults(evals);
+}
+
+function renderResults(evals){
+  const area=$("#resultsArea"); area.innerHTML="";
+  const byGroup={};
+  GROUPS.forEach(g=>byGroup[g]=[]);
+  evals.forEach(e=>{ (byGroup[e.grupo]=byGroup[e.grupo]||[]).push(e); });
+
+  const names=Object.keys(byGroup);
+  const totalEvs=evals.length;
+  $("#teacherSummary").textContent=`${totalEvs} evaluación(es) · ${names.filter(g=>byGroup[g].length).length} de ${GROUPS.length} grupos con notas`;
+
+  if(!names.length){ area.innerHTML='<p class="muted">Aún no hay grupos ni evaluaciones.</p>'; return; }
+
+  const table=el("table");
+  table.innerHTML=`<thead><tr><th>Grupo / alumno</th><th class="num">N.º</th>
+    <th class="num">Proceso</th><th class="num">Esquema</th><th class="num">Pizarra</th>
+    <th class="num">Sosten.</th><th class="num">Autoría</th>
+    <th class="num">Nota final</th><th></th></tr></thead>`;
+  const tb=el("tbody");
+  names.forEach(g=>{
+    const list=byGroup[g]||[];
+    const n=list.length;
+    const avg=k=> n? round2(list.reduce((s,e)=>s+(+e[k]||0),0)/n) : null;
+    const a1=avg("c1"),a2=avg("c2"),a3=avg("c3"),a4=avg("c4"),a5=avg("c5"),at=avg("total");
+    const tr=el("tr","grp");
+    tr.innerHTML=`<td><b>${esc(g)}</b></td><td class="num">${n}</td>
+      <td class="num">${a1!=null?fmt(a1):"—"}</td>
+      <td class="num">${a2!=null?fmt(a2):"—"}</td>
+      <td class="num">${a3!=null?fmt(a3):"—"}</td>
+      <td class="num">${a4!=null?fmt(a4):"—"}</td>
+      <td class="num">${a5!=null?fmt(a5):"—"}</td>
+      <td class="num grade">${at!=null?fmt(at):"—"}</td>
+      <td class="num"><button class="btn sec small" onclick="event.stopPropagation();reveal('${g.replace(/'/g,"\\'")}')">Mostrar</button></td>`;
+    const det=el("tr","detail"); det.classList.add("hidden");
+    const dtd=el("td"); dtd.colSpan=9;
+    if(n){
+      dtd.innerHTML=list.map(e=>`<div style="padding:4px 0;border-bottom:1px dashed var(--line)">
+        <b>${esc(e.evaluador)}</b> → ${fmt(+e.total)}/10
+        <span class="muted">(Proc:${fmt(+e.c1)} · Esq:${fmt(+e.c2)} · Piz:${fmt(+e.c3)} · Sost:${fmt(+e.c4)} · IA:${fmt(+e.c5)})</span>
+        ${e.comentario?`<br><span class="muted">“${esc(e.comentario)}”</span>`:""}
+      </div>`).join("");
+    }else dtd.innerHTML='<span class="muted">Sin evaluaciones todavía.</span>';
+    det.appendChild(dtd);
+    tr.onclick=()=>det.classList.toggle("hidden");
+    tb.appendChild(tr); tb.appendChild(det);
+  });
+  table.appendChild(tb);
+  area.appendChild(table);
+  area._byGroup=byGroup;
+}
+function esc(s){return (s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---- Mostrar a la clase ---- */
+function reveal(g){
+  const byGroup=$("#resultsArea")._byGroup||{};
+  const list=byGroup[g]||[]; const n=list.length;
+  const avg=k=> n? round2(list.reduce((s,e)=>s+(+e[k]||0),0)/n):0;
+  $("#rvName").textContent=g;
+  $("#rvGrade").textContent= n? fmt(avg("total")) : "—";
+  $("#rvCount").textContent= n? `Media de ${n} evaluación(es) de sus compañeros` : "Sin evaluaciones";
+  $("#rvBreak").innerHTML=CONFIG.rubric.map(c=>{
+    const a=n?fmt(avg(c.id)):"—";
+    return `<div>${esc(c.name)}<b>${a}</b><span class="muted">/10 · ${pct(c.peso)}</span></div>`;
+  }).join("");
+  $("#reveal").classList.remove("hidden");
+}
+function closeReveal(){$("#reveal").classList.add("hidden");}
+
+/* =================================================================
+   Backend (Apps Script) y modo demo (localStorage)
+   ================================================================= */
+async function api(payload){
+  // POST text/plain → sin preflight CORS
+  const res=await fetch(CONFIG.backendUrl,{
+    method:"POST",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  });
+  return res.json();
+}
+const LS_EV="coev_energia_evals", LS_GR="coev_energia_groups";
+function loadGroupsLocal(){ try{const g=JSON.parse(localStorage.getItem(LS_GR)); return Array.isArray(g)&&g.length?g:CONFIG.defaultGroups.slice();}catch(e){return CONFIG.defaultGroups.slice();} }
+function saveGroupsLocal(g){ try{localStorage.setItem(LS_GR,JSON.stringify(g));}catch(e){} }
+function demoAll(){ try{return JSON.parse(localStorage.getItem(LS_EV))||[];}catch(e){return [];} }
+function demoSubmit(p){ const a=demoAll(); a.push({...p,timestamp:new Date().toISOString()}); localStorage.setItem(LS_EV,JSON.stringify(a)); }
+
+init();
+</script>
+</body>
+</html>
